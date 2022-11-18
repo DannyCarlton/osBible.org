@@ -15,6 +15,7 @@
  * 
  *****************************/
 
+  # $_mysql will be our db connection variable. Mysqli requires it for almost everything.
 $_mysql = mysqli_connect('localhost','db_user','db_password','osbible');
 
 /******************************
@@ -24,23 +25,34 @@ $_mysql = mysqli_connect('localhost','db_user','db_password','osbible');
  * 
  *****************************/
 
-$querytext = sprintf("SELECT * FROM `kjv_books`;");						# The mysql query, cleaned with sprintf
-$query=mysqli_query($_mysql, $querytext);								# submit the query
-if(mysqli_errno($_mysql))												# check for errors
+	# The mysql query, cleaned with sprintf
+$querytext = sprintf("SELECT * FROM `kjv_books`;");
+	# Submit the query
+$query=mysqli_query($_mysql, $querytext);
+	# Check for errors
+if(mysqli_errno($_mysql))
 	{
-	echo ": " . mysqli_error($_mysql) . "\n<hr>$querytext";				# if there's an error, display it and the querytext for debugging
+	# If there's an error, display it and the querytext for debugging
+	echo ": " . mysqli_error($_mysql) . "\n<hr>$querytext";
 	}
-if(mysqli_num_rows($query))												# if there's a result...
+	# If there's a result...
+if(mysqli_num_rows($query))
 	{
-	while ($dbRow = mysqli_fetch_assoc($query)) 						# 	begin processing the results
+	# 	Begin processing the results
+	while ($dbRow = mysqli_fetch_assoc($query))
 		{
-		$id=$dbRow['id'];												# 	get the id of this row
-		$book=$dbRow['book'];											# 	let's grab the book name, too.
-		$Books[$id]=$dbRow;												# 	put the entire row into an array element
-		$Bids[$book]=$id;												# 	an easy array to find the book id from the name.						
+	# 	Get the id of this row
+		$id=$dbRow['id'];
+	# 	Let's grab the book name, too.
+		$book=$dbRow['book'];
+	# 	Put the entire row into an array element
+		$Books[$id]=$dbRow;
+	# 	An easy array to find the book id from the name.	
+		$Bids[$book]=$id;					
 		}
 	}
-mysqli_free_result($query);												# supposedly you're supposed to do this.
+	# Supposedly you're supposed to do this.
+mysqli_free_result($query);
 
 /*******************************
  * 
@@ -48,12 +60,21 @@ mysqli_free_result($query);												# supposedly you're supposed to do this.
  * 
  *****************************/
 
-$reference='John 3:16';													# We will start with a simple reference that won't need correcting,
-																		# 	but will need the book name converted to the id of the book
-list($book,$ref)=explode(' ',$reference);								# Since we're assuming a correct reference, we split the reference
-$bid=$Bids[$book];														# Using the $bids (book ids) array we can get the book id.
-list($chapter,$verse)=explode(':',$ref);								# we split the remaining ref into chapter and verse.
-
+	# We will start with a simple reference that won't need correcting,
+	# 	but will need the book name converted to the id of the book
+$reference='John 3:16';
+	# Since we're assuming a correct reference, we split the reference
+list($book,$ref)=explode(' ',$reference);
+	# Using the $bids (book ids) array we can get the book id.
+$bid=$Bids[$book];
+	# We split the remaining ref into chapter and verse.
+list($chapter,$verse)=explode(':',$ref);
+/********************************************
+ * 
+ * Explanation of the querytext... 
+ * 	We use sprintf to clean the query text and prevent any mysql injection hacking.
+ * 	We limit it to one so we don't have to run through the entire table after we've found the data we need.
+ */
 $querytext=sprintf("SELECT	`text` 		FROM	`kjvs`
 					WHERE	`book` 		= 		'%s'
 					AND 	`chapter`	=		'%s'
@@ -62,18 +83,17 @@ $querytext=sprintf("SELECT	`text` 		FROM	`kjvs`
 			mysqli_real_escape_string($_mysql, $bid),
 			mysqli_real_escape_string($_mysql, $chapter),
 			mysqli_real_escape_string($_mysql, $verse));
-/********************************************
- * 
- * Explanation of the querytext... 
- * 	We use sprintf to clean the query text and prevent any mysql injection hacking.
- * 	We limit it to one so we don't have to run through the entire table after we've found the data we need.
- */
 
-$query = mysqli_query($_mysql, $querytext);								# Submit the query
-$Verse = mysqli_fetch_array($query);									# Receive the results
-$text=$Verse['text'];													# Assign the data to $text
-$text=preg_replace('/\{(.*?)\}/', '', $text);							# Filter out the Strong's numbers (we don't need them now)
-echo "&ldquo;$text&rdquo;&mdash;$book $chapter:$verse";					# echo the verse
+	# Submit the query
+$query = mysqli_query($_mysql, $querytext);
+	# Receive the results
+$Verse = mysqli_fetch_array($query);
+	# Assign the data to $text
+$text=$Verse['text'];
+	# Filter out the Strong's numbers (we don't need them now)
+$text=preg_replace('/\{(.*?)\}/', '', $text);
+	# Echo the verse
+echo "&ldquo;$text&rdquo;&mdash;$book $chapter:$verse";	
 
 /**********************************************************
  *  The page output should look like... 
