@@ -50,7 +50,7 @@ foreach($References as $n=>$reference)
 	# To avoid confusing the filter we'll make all book references lower case
 	$reference=strtolower($reference);
 	# We'll use the function to split the book part from the nymber part and return it all in an array
-	$BookData=getRefByKeyword($reference);
+	$BookData=getBookByKeyword($reference);
 	# We want the book id for the next database query
 	$bid=$BookData['id'];
 	# Here we'll have the book name
@@ -81,7 +81,7 @@ foreach($References as $n=>$reference)
 
 
 
-function getRefByKeyword($k)
+function getBookByKeyword($k)
 	{
 	# Bring our databse connection within the scope of the function
 	global $_mysql;
