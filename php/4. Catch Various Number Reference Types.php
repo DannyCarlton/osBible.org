@@ -50,13 +50,14 @@ $References[]='John 3.16';
 
 foreach($References as $n=>$reference)
 	{
+	echo "<hr><hr><hr>";$chapters=1;
 	# We'll reserve the original reference
 	$_reference=$reference;
 	# We'll grab the note to display
 	$note=$Note[$n];
 	# To avoid confusing the filter we'll make all book references lower case
 	$reference=strtolower($reference);
-	# We'll use the function to split the book part from the nymber part and return it all in an array
+	# We'll use the function to split the book part from the number part and return it all in an array
 	$BookData=getBookByKeyword($reference);
 	echo "<b>reference: $reference</b> ($note)<br>";
 	# We want the book id for the next database query
@@ -65,30 +66,87 @@ foreach($References as $n=>$reference)
 	$book=$BookData['book'];
 	# Sending the entire $BookData array provides all the info we need to process the number keys
 	$Verses=putNumRefInArray($BookData);
-	echo "<b>Verses</b><pre>".print_r($Verses,true)."</pre>";
-	# We'll split the chapter from the verse
-#	list($chapter,$verse)=explode(':',$BookData['num_key']);
-	# Now we'll build our query... 
-	$querytext=sprintf("SELECT	`text` 		FROM	`kjvs`
-						WHERE	`book` 		= 		'%s'
-						AND 	`chapter`	=		'%s'
-						AND		`verse`		=		'%s'
-						LIMIT	1;",
-						mysqli_real_escape_string($_mysql, $bid),
-						mysqli_real_escape_string($_mysql, $chapter),
-						mysqli_real_escape_string($_mysql, $verse));
+#	echo "<b>Verses</b><pre>".print_r($Verses,true)."</pre>";
+	$numKeys=$Verses['numKeys'];
+	# the numKeys is an array of the passages requested (we'll still need to process the verse portion of each passage)
+	$Result=[];
+	$out='';$old_chapter=0;
+	foreach($numKeys as $n=>$numKey)
+		{
+		$chapter=$numKey['chapter'];
+		if($old_chapter and ($chapter!=$old_chapter))
+			{
+			$chapters++;
+			}
+		$old_chapter=$chapter;
+		$verses=$numKey['verses'];
+		$corrected_ref="$book $chapter:$verses";
+		# now we need to determine if it's just one verse, verses divided by commas, a list with a dash or in some cases, both
+		$verseList=[];
+		if(strstr($verses,','))
+			{
+			$_Verses=explode(',',$verses);
+			foreach($_Verses as $verse)
+				{
+				if(strstr($verse,'-'))
+					{
+					list($start,$end)=explode('-',$verse);
+					for($i=$start;$i<=$end;$i++)
+						{
+						$verseList[]=$i;
+						}
+					}
+				else
+					{
+					$verseList[]=$verse;
+					}
+				}
+			}
+		elseif(strstr($verses,'-'))
+			{
+			list($start,$end)=explode('-',$verses);
+			for($i=$start;$i<=$end;$i++)
+				{
+				$verseList[]=$i;
+				}
+			}
+		else
+			{
+			$verseList[]=$verses;
+			}
+#		echo "<b>Verse List</b><pre>".print_r($verseList,true)."</pre>";
+		foreach($verseList as $v)
+			{
+			# Now we'll build our query... 
+			$querytext=sprintf("SELECT	* 		FROM	`kjvs`
+								WHERE	`book` 		= 		'%s'
+								AND 	`chapter`	=		'%s'
+								AND		`verse`		=		'%s'
+								LIMIT	1;",
+								mysqli_real_escape_string($_mysql, $bid),
+								mysqli_real_escape_string($_mysql, $chapter),
+								mysqli_real_escape_string($_mysql, $v));
+#			echo "$querytext<br>";
+			# Submit the query
+			$query = mysqli_query($_mysql, $querytext);
+			# Receive the results
+			$Verse = mysqli_fetch_array($query);
+			# Assign the data to $text
+			$text=$Verse['text'];
+			# Filter out the Strong's numbers (we don't need them now)
+			$text=preg_replace('/\{(.*?)\}/', '', $text);
+			$Verse['text']=$text;
+			$Verse['book']=$book;
+			$Result[]=$Verse;
+			$out.="<div><b>$chapter:$v.</b> $text</div>";
+			}
 
-	echo "$querytext<br>";
-	# Submit the query
-#	$query = mysqli_query($_mysql, $querytext);
-	# Receive the results
-#	$Verse = mysqli_fetch_array($query);
-	# Assign the data to $text
-#	$text=$Verse['text'];
-	# Filter out the Strong's numbers (we don't need them now)
-	$text=preg_replace('/\{(.*?)\}/', '', $text);
+		echo "Chapters: $chapters<br>Corrected reference: $corrected_ref<br>Result: $out<hr>";
+		$out='';
+		}
 	# Echo the original reference with the verse and correct reference
-	echo "Original reference: $_reference ($note)<br>Result: &ldquo;$text&rdquo;&mdash;$book $chapter:$verse<hr>";	
+#	echo "<b>Verse List</b><pre>".print_r($Result,true)."</pre>";	
+
 	}
 
 
