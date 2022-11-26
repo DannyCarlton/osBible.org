@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>osBible.org &mdash; Get a Single verse with JavaScript and AJAX</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	</head>
+	<body>
+		<div style="margin:30px;width:500px;margin-left:auto;margin-right:auto">
+			<h1>Fetching a Single verse using JavaScript and AJAX.</h1>
+			<form id="to-get-verse" action="../php/5. AJAX Response.php" method="GET" style="width:100%;clear:both">
+				<input type="text" name="keyword" id="keyword" placeholder="Enter verse reference here." style="width:100%;padding:3px" /><br>
+				<input type="submit" value="Fetch Verse" style="float:right;margin-top:5px" />
+			</form>
+			<div style="margin-top:40px;clear:both;width:400px;margin-left:auto;margin-right:auto" id="verse-goes-here"></div>
+		</div>
+
+		<script>
+			var form = document.getElementById("to-get-verse");
+			async function handleSubmit(event) 
+				{
+				event.preventDefault();
+				var target=document.getElementById('verse-goes-here');
+				var keyword=document.getElementById('keyword').value;
+				//target.innerHTML=keyword;
+
+				var xhttp = new XMLHttpRequest();
+				xhttp.onload = function() 
+					{
+					var obj = JSON.parse(this.responseText);
+					if(Object.keys(obj.text).length==1)
+						{
+						document.getElementById('verse-goes-here').innerHTML='&ldquo;'+obj.text+'&rdquo;&mdash;'+obj.ref;
+						}
+					else
+						{
+						document.getElementById('verse-goes-here').innerHTML='Oops! We\'re only doing single verses with this example.';
+						}
+					}
+				xhttp.open("GET", "../php/5. AJAX Response.php?keyword="+keyword+"&r=5", true);
+				xhttp.send();
+				}
+			form.addEventListener("submit", handleSubmit);
+		</script>
+	</body>
+</html>
