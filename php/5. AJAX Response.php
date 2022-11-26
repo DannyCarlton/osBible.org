@@ -126,24 +126,28 @@ $corrected_ref=rtrim($corrected_ref,'; ');
 # Echo the original reference with the verse and correct reference
 if($chapters==1 and count($Out)==1)
 	{
-	echo "<b>$corrected_ref</b><br>&ldquo;{$Out[0]['text']}&rdquo;";
+	$Return['ref']=$corrected_ref;
+	$Return['text'][0]=$Out[0]['text'];
 	}
 elseif($chapters==1)
 	{
-	echo "<b>$corrected_ref</b><br>";
-	foreach($Out as $Verse)
+	$Return['ref']=$corrected_ref;
+	foreach($Out as $c=>$Verse)
 		{
-		echo "<b>{$Verse['verse']}</b> {$Verse['text']}<br>";
+		$Return['text'][$c]="<b>{$Verse['verse']}</b> {$Verse['text']}";
 		}
 	}
 else
 	{
-	echo "<b>$corrected_ref</b><br>";
-	foreach($Out as $Verse)
+	$Return['ref']=$corrected_ref;
+	foreach($Out as $c=>$Verse)
 		{
-		echo "<b>{$Verse['chapter']}:{$Verse['verse']}</b> {$Verse['text']}<br>";
+		$Return['text'][$c]="<b>{$Verse['verse']}</b> {$Verse['text']}";
 		}
 	}
+
+$return=json_encode($Return,true);
+echo $return;
 
 
 
