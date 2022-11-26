@@ -1,18 +1,17 @@
 <?php 
 
-echo "<h1>This is still under development.</h1>";
 
-error_reporting(E_PARSE | E_ERROR);
-#error_reporting(E_ALL);
+#error_reporting(E_PARSE | E_ERROR);
+error_reporting(E_ALL);
 /*************************************************************************************
  * 
- * 	This script is to demonstrate how to catch a variety of reference types including 
- * 		abbreviations and misspellings.
+ * 	This script is to demonstrate how to catch a variety of numeric (chapter and verse) reference types 
+ * 		including multiple verses, multiple chapters, lists and others..
  *	It will used the function getBookByKeyword which takes what is offered as the 
  *		book, whether it's the full name, an abbreviation or a misspelling and 
  *		return the data contained on the kjv_books database for that book.
  *	We will also use the function putNumRefInArray to take the numeric part of the 
- *		reference and return an array of verses.
+ *		reference and return an array of correct verses.
  * 
  ***************************************************************************************/
 
@@ -50,7 +49,10 @@ $References[]='John 3.16';
 
 foreach($References as $n=>$reference)
 	{
-	echo "<hr><hr><hr>";$chapters=1;
+	# initialize some variables
+	$_c=0;$corrected_ref='';$chapters=1;
+	# create a visual divider between references and results
+	echo "<hr>";	
 	# We'll reserve the original reference
 	$_reference=$reference;
 	# We'll grab the note to display
@@ -66,21 +68,23 @@ foreach($References as $n=>$reference)
 	$book=$BookData['book'];
 	# Sending the entire $BookData array provides all the info we need to process the number keys
 	$Verses=putNumRefInArray($BookData);
-#	echo "<b>Verses</b><pre>".print_r($Verses,true)."</pre>";
-	$numKeys=$Verses['numKeys'];
 	# the numKeys is an array of the passages requested (we'll still need to process the verse portion of each passage)
-	$Result=[];
-	$out='';$old_chapter=0;
+	$numKeys=$Verses['numKeys'];
+	# initialize/reset some variables
+	$Result=[];	$out='';$old_chapter=0;	$out='';
+	# run through the number keys
 	foreach($numKeys as $n=>$numKey)
 		{
+		# get the chapter
 		$chapter=$numKey['chapter'];
+		# if it's different from the previous chapter, count the chapters
 		if($old_chapter and ($chapter!=$old_chapter))
 			{
 			$chapters++;
 			}
 		$old_chapter=$chapter;
 		$verses=$numKey['verses'];
-		$corrected_ref="$book $chapter:$verses";
+		$corrected_ref.="$book $chapter:$verses; ";
 		# now we need to determine if it's just one verse, verses divided by commas, a list with a dash or in some cases, both
 		$verseList=[];
 		if(strstr($verses,','))
@@ -114,7 +118,6 @@ foreach($References as $n=>$reference)
 			{
 			$verseList[]=$verses;
 			}
-#		echo "<b>Verse List</b><pre>".print_r($verseList,true)."</pre>";
 		foreach($verseList as $v)
 			{
 			# Now we'll build our query... 
@@ -126,7 +129,6 @@ foreach($References as $n=>$reference)
 								mysqli_real_escape_string($_mysql, $bid),
 								mysqli_real_escape_string($_mysql, $chapter),
 								mysqli_real_escape_string($_mysql, $v));
-#			echo "$querytext<br>";
 			# Submit the query
 			$query = mysqli_query($_mysql, $querytext);
 			# Receive the results
@@ -139,14 +141,37 @@ foreach($References as $n=>$reference)
 			$Verse['book']=$book;
 			$Result[]=$Verse;
 			$out.="<div><b>$chapter:$v.</b> $text</div>";
+			$Out[$_c]['book']=$book;
+			$Out[$_c]['chapter']=$chapter;
+			$Out[$_c]['verse']=$Verse['verse'];
+			$Out[$_c]['text']=$text;
+			$_c++;
+			}
+		}
+	$corrected_ref=rtrim($corrected_ref,'; ');
+	# Echo the original reference with the verse and correct reference
+	if($chapters==1 and count($Out)==1)
+		{
+		echo "<b>$corrected_ref</b><br>&ldquo;{$Out[0]['text']}&rdquo;";
+		}
+	elseif($chapters==1)
+		{
+		echo "<b>$corrected_ref</b><br>";
+		foreach($Out as $Verse)
+			{
+			echo "<b>{$Verse['verse']}</b> {$Verse['text']}<br>";
+			}
+		}
+	else
+		{
+		echo "<b>$corrected_ref</b><br>";
+		foreach($Out as $Verse)
+			{
+			echo "<b>{$Verse['chapter']}:{$Verse['verse']}</b> {$Verse['text']}<br>";
 			}
 
-		echo "Chapters: $chapters<br>Corrected reference: $corrected_ref<br>Result: $out<hr>";
-		$out='';
 		}
-	# Echo the original reference with the verse and correct reference
-#	echo "<b>Verse List</b><pre>".print_r($Result,true)."</pre>";	
-
+	$Out=[];
 	}
 
 
@@ -157,7 +182,6 @@ function getBookByKeyword($k)
 	# Bring our databse connection within the scope of the function
 	global $_mysql;
 	# Set some variables
-#	$Return['id']=0;
 	$Return['bid']=0;
 	$Return['book']='';
 	$Return['chapters']=0;
@@ -216,7 +240,7 @@ function getBookByKeyword($k)
 	$_c=0;
 	# Let's explain the query... 
 	# 	First we look in the `abbr` column for matches. Theindividual abbreviations are delimited by | 
-	# 	We "score" the macthes so that the one with the best "score" rises to the top and we get it.
+	# 	We "score" the matches so that the one with the best "score" rises to the top and we get it.
     $queryText = sprintf("SELECT * FROM `kjv_books` WHERE `abbr` LIKE '%%|%s|%%' || `book` LIKE '%s' || `kjav_abr` LIKE '%s' || `book` SOUNDS LIKE '%s'
                          ORDER BY
                          case when `abbr` LIKE '%%|%s|%%' then 4 else 0 end
@@ -239,7 +263,6 @@ function getBookByKeyword($k)
 		$c=0;
 		while ($dbRow = mysqli_fetch_assoc($query)) 
 			{
-#			$Return['dbRow']=$dbRow;
 			$c++;
 			if($dbRow['book']=='Psalms'){$dbRow['book']='Psalm';}
 			$Return['bid']=$dbRow['id'];
@@ -247,7 +270,6 @@ function getBookByKeyword($k)
 			$Return['chapters']=$dbRow['chapters'];
 			}
 		}		
-#	$Return['queryText']=$queryText;
 	return $Return;
 	}
 
@@ -262,8 +284,8 @@ function putNumRefInArray($BookData)
 	$book=$BookData['book'];
 	# Get the number of chapters in that book
 	$num_key=$BookData['num_key'];
-	# Is it a single number?
-	$_num_key=$num_key*1;
+	# Is it a single number? By changing it to an interger, it will either remove other characters or set it to zero
+	$_num_key=(int)$num_key;
 	if($num_key==$_num_key)
 		{
 	# 	If yes... 
@@ -305,19 +327,7 @@ function putNumRefInArray($BookData)
 		list($chapter,$verses)=explode(':',$ref);
 		$numKeys[$f]['chapter']=$chapter;
 		$numKeys[$f]['verses']=$verses;
-
-	# Does the verse part have a comma or dash? 
-		if(strstr($verses,'-') or strstr($verses,','))
-			{
-	# 	If yes... 
-	# 		Is it a comma? 
-	# 			Yes: add the verse individually to the array 
-	# 		Is it a dash? 
-	# 			Yes: Add the verses within the range to the array
-
-			}
 		}
-	# 
 	$Return['numKeys']=$numKeys;
 	return $Return;
 	}
