@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>osBible.org &mdash; Get Multiple Verses with JavaScript and AJAX</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<!-- the passage will be sent encased in the following tags. 
+				We'll use CSS to determine how those elements are displayed.
+				This is a traditional display. For a modern display, we'd make 
+				the verse number a subscript and the verse a span. -->
+		<style>
+			num {
+				font-weight:bold;
+			}
+			verse {
+				display:block;
+				text-align:justify;
+			}
+			ref {
+				display:block;
+				float:right;
+				font-weight:bold;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="margin:30px;width:500px;margin-left:auto;margin-right:auto">
+			<h1>Fetching Multiple Verses using JavaScript and AJAX.</h1>
+			<form id="to-get-verse" action="../php/5. AJAX Response.php" method="GET" style="width:100%;clear:both">
+				<input type="text" name="keyword" id="keyword" placeholder="Enter verse reference here." style="width:100%;padding:3px" /><br>
+				<input type="submit" value="Fetch Verse" style="float:right;margin-top:5px" />
+			</form>
+			<div style="margin-top:40px;clear:both;width:400px;margin-left:auto;margin-right:auto" id="verse-goes-here"></div>
+		</div>
+
+		<script>
+			var form = document.getElementById("to-get-verse");
+			async function handleSubmit(event) 
+				{
+				event.preventDefault();
+				var target=document.getElementById('verse-goes-here');
+				var keyword=document.getElementById('keyword').value;
+
+				var xhttp = new XMLHttpRequest();
+				xhttp.onload = function() 
+					{
+					var obj = JSON.parse(this.responseText);
+					// Since the verses will be in an array, we'll set a variable to hold the final text.
+					var passage='';
+					// loop through the array of verses
+					for (var verse in obj.text) 
+						{
+						passage+=obj.text[verse];
+						}
+					// format the out put and display it
+					document.getElementById('verse-goes-here').innerHTML=passage+'<ref>'+obj.ref+'</ref>';
+					}
+				// The &r=1 is a quick way to force new data and bypass the cache. I change it (&r=2) to get ne data
+				xhttp.open("GET", "../php/5. AJAX Response.php?keyword="+keyword+"&r=1", true);
+				xhttp.send();
+				}
+			form.addEventListener("submit", handleSubmit);
+		</script>
+	</body>
+</html>
