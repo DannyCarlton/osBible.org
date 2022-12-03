@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>osBible.org &mdash; Get Multiple Verses with jQuery and AJAX</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<script src="http://code.jquery.com/jquery-3.6.1.min.js"></script>
+		<style>
+			num {
+				font-weight:bold;
+			}
+			verse {
+				display:block;
+				text-align:justify;
+			}
+			ref {
+				display:block;
+				float:right;
+				font-weight:bold;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="margin:30px;width:500px;margin-left:auto;margin-right:auto">
+			<h1>Fetching a Single verse using jQuery and AJAX.</h1>
+			<form id="to-get-verse" action="../php/5. AJAX Response.php" method="GET" style="width:100%;clear:both">
+				<input value="Psalm 23" type="text" name="keyword" id="keyword" placeholder="Enter verse reference here." style="width:100%;padding:3px" /><br>
+				<input id="verseSearch" type="submit" value="Fetch Verse" style="float:right;margin-top:5px" />
+			</form>
+			<div style="margin-top:40px;clear:both;width:400px;margin-left:auto;margin-right:auto" id="verse-goes-here"></div>
+		</div>
+
+		<script>
+
+
+			$("#verseSearch").click(function(e){
+				e.preventDefault();
+				var keyword=$("#keyword").val();
+				$.ajax({
+					url: "../php/5. AJAX Response.php?keyword="+keyword,
+					cache: false
+					})
+				.done(function(data){
+					var Verse=$.parseJSON(data);
+					var passage='';
+					for (var verse in Verse['text']) 
+						{
+						passage+=Verse['text'][verse];
+						}
+					verse=Verse['text'];
+					ref=Verse['ref'];
+					$('#verse-goes-here').html(passage+'<ref>'+ref+'</ref>');
+					});					
+				});
+
+
+		</script>
+	</body>
+</html>
