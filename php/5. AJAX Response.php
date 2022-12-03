@@ -134,7 +134,7 @@ elseif($chapters==1)
 	$Return['ref']=$corrected_ref;
 	foreach($Out as $c=>$Verse)
 		{
-		$Return['text'][$c]="<b>{$Verse['verse']}</b> {$Verse['text']}";
+		$Return['text'][$c]="<verse><num>{$Verse['verse']}</num> {$Verse['text']}</verse>";
 		}
 	}
 else
@@ -142,7 +142,7 @@ else
 	$Return['ref']=$corrected_ref;
 	foreach($Out as $c=>$Verse)
 		{
-		$Return['text'][$c]="<b>{$Verse['verse']}</b> {$Verse['text']}";
+		$Return['text'][$c]="<verse><num>{$Verse['verse']}</num> {$Verse['text']}</verse>";
 		}
 	}
 
