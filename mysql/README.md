@@ -1,2 +1,3 @@
-# Open Source Bible Project — mysql databases
+# Open Source Bible Project &mdash; mysql databases
 These are the basic database tables needed for an online Bible.
+
