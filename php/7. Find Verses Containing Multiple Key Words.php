@@ -1,5 +1,6 @@
 <?php 
 error_reporting(E_ALL);
+echo "<h1>Find verses containing multiple key words.</h1>";
 /*************************************************************************************
  * 
  * 	This script is to demonstrate a more complicated search using multiple keywords.
