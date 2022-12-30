@@ -1,4 +1,5 @@
 <?php 
+echo "<h1>Find verses containing a key word.</h1>";
 /*************************************************************************************
  * 
  * 	This script is to demonstrate a simple search for verses containing a single keyword.
