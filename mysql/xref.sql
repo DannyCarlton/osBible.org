@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `xref_holman`
+-- Table structure for table `xref`
 --
 
-CREATE TABLE `xref_holman` (
+CREATE TABLE `xref` (
   `id` int(11) NOT NULL,
   `book` int(11) NOT NULL,
   `chapter` int(11) NOT NULL,
@@ -37,10 +37,10 @@ CREATE TABLE `xref_holman` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `xref_holman`
+-- Dumping data for table `xref`
 --
 
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (1, 1, 1, 1, 'a', 'Joh 1:1,3'),
 (2, 1, 1, 1, 'b', 'Rev 4:11'),
 (3, 1, 1, 1, 'b', 'Heb 11:3'),
@@ -1530,7 +1530,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (1487, 1, 31, 44, 'u', 'Gen 26:28'),
 (1488, 1, 31, 44, 'v', 'Jos 24:27'),
 (1489, 1, 31, 45, 'w', 'Gen 28:18');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (1490, 1, 31, 48, 'x', 'Jos 24:27'),
 (1491, 1, 31, 49, 'y', 'Jdg 11:29'),
 (1492, 1, 31, 49, 'y', '1 Sam 7:5'),
@@ -2993,7 +2993,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (2949, 2, 9, 14, 'n', '2 Sam 7:22'),
 (2950, 2, 9, 14, 'n', 'Deu 33:26'),
 (2951, 2, 9, 14, 'n', 'Deu 3:24');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (2952, 2, 9, 15, 'o', 'Jer 8:20'),
 (2953, 2, 9, 16, 'p', '1 Pet 2:9'),
 (2954, 2, 9, 16, 'p', 'Rom 9:17'),
@@ -4447,7 +4447,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (4402, 2, 33, 13, 'm', 'Psa 119:33'),
 (4403, 2, 33, 13, 'm', 'Psa 86:11'),
 (4404, 2, 33, 13, 'm', 'Psa 27:11');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (4405, 2, 33, 13, 'm', 'Psa 25:4'),
 (4406, 2, 33, 13, 'n', 'Exo 34:9'),
 (4407, 2, 33, 14, 'o', 'Psa 95:11'),
@@ -5913,7 +5913,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (5867, 3, 16, 26, 'd', 'Lev 15:5'),
 (5868, 3, 16, 26, 'd', 'Heb 9:10'),
 (5869, 3, 16, 27, 'e', 'Heb 13:11');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (5870, 3, 16, 27, 'e', 'Lev 8:17'),
 (5871, 3, 16, 27, 'e', 'Lev 6:30'),
 (5872, 3, 16, 27, 'e', 'Lev 4:21'),
@@ -7379,7 +7379,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (7332, 4, 11, 1, 'a', 'Deu 9:22'),
 (7333, 4, 11, 1, 'a', 'Lam 3:39'),
 (7334, 4, 11, 1, 'b', 'Lev 10:2');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (7335, 4, 11, 1, 'b', '2 Kin 1:12'),
 (7336, 4, 11, 2, 'c', 'Jam 5:16'),
 (7337, 4, 11, 4, 'd', 'Exo 12:38'),
@@ -8824,7 +8824,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (8776, 4, 32, 14, 'o', 'Deu 1:34'),
 (8777, 4, 32, 15, 'p', 'Deu 30:17'),
 (8778, 4, 32, 15, 'p', '2 Chr 7:19');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (8779, 4, 32, 15, 'p', '2 Chr 15:2'),
 (8780, 4, 32, 17, 'q', 'Jos 4:12-13'),
 (8781, 4, 32, 18, 'r', 'Jos 22:4'),
@@ -10284,7 +10284,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (10235, 5, 22, 1, 'c', '2 Pet 1:7'),
 (10236, 5, 22, 1, 'c', 'Rom 12:10'),
 (10237, 5, 22, 5, 'd', '1 Cor 14:40');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (10238, 5, 22, 6, 'e', 'Luk 12:6'),
 (10239, 5, 22, 6, 'e', 'Mat 10:29'),
 (10240, 5, 22, 6, 'e', 'Pro 12:10'),
@@ -11707,7 +11707,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (11657, 6, 13, 6, 'l', 'Jos 11:8'),
 (11658, 6, 13, 6, 'm', 'Jos 23:13'),
 (11659, 6, 13, 6, 'n', 'Jos 14:1-2');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (11660, 6, 13, 8, 'o', 'Jos 22:4'),
 (11661, 6, 13, 8, 'o', 'Num 32:33'),
 (11662, 6, 13, 9, 'p', 'Num 21:30'),
@@ -13126,7 +13126,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (13075, 7, 15, 8, 'd', '1 Chr 4:3'),
 (13076, 7, 15, 8, 'd', '2 Chr 11:6'),
 (13077, 7, 15, 11, 'e', 'Jdg 14:4');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (13078, 7, 15, 11, 'e', 'Jdg 2:13-14'),
 (13079, 7, 15, 11, 'e', 'Deu 28:43-44'),
 (13080, 7, 15, 11, 'e', 'Lev 26:25'),
@@ -14542,7 +14542,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (14490, 9, 17, 47, 'e', 'Hos 1:7'),
 (14491, 9, 17, 47, 'e', 'Zec 4:6'),
 (14492, 9, 17, 47, 'f', '2 Chr 20:15');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (14493, 9, 17, 50, 'g', '2 Sam 23:21'),
 (14494, 9, 17, 50, 'g', '1 Sam 21:9'),
 (14495, 9, 17, 50, 'g', 'Jdg 3:31'),
@@ -15921,7 +15921,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (15868, 10, 17, 17, 'h', '2 Sam 15:36'),
 (15869, 10, 17, 17, 'i', 'Jos 2:4'),
 (15870, 10, 17, 17, 'j', 'Jos 15:7');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (15871, 10, 17, 17, 'j', '1 Kin 1:9'),
 (15872, 10, 17, 18, 'k', '2 Sam 19:16'),
 (15873, 10, 17, 18, 'k', '2 Sam 16:5'),
@@ -17285,7 +17285,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (17231, 11, 16, 9, 'j', 'Isa 1:28'),
 (17232, 11, 16, 9, 'j', 'Pro 20:1'),
 (17233, 11, 16, 9, 'j', 'Job 31:3');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (17234, 11, 16, 9, 'j', '1 Kin 20:16'),
 (17235, 11, 16, 9, 'j', '2 Sam 13:28-29'),
 (17236, 11, 16, 9, 'j', '1 Sam 25:36-38'),
@@ -18645,7 +18645,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (18590, 12, 19, 9, 'j', '1 Sam 23:27'),
 (18591, 12, 19, 9, 'j', 'Isa 37:9'),
 (18592, 12, 19, 10, 'k', 'Isa 37:14');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (18593, 12, 19, 10, 'k', 'Isa 37:10'),
 (18594, 12, 19, 10, 'k', '2 Kin 18:5'),
 (18595, 12, 19, 12, 'l', 'Gen 11:31'),
@@ -20004,7 +20004,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (19948, 13, 28, 21, 'h', '1 Chr 24'),
 (19949, 13, 28, 21, 'h', '1 Chr 25'),
 (19950, 13, 28, 21, 'i', '1 Chr 25');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (19951, 13, 29, 1, 'a', '1 Kin 3:7'),
 (19952, 13, 29, 1, 'a', '1 Chr 22:5'),
 (19953, 13, 29, 1, 'a', 'Pro 4:3'),
@@ -21362,7 +21362,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (21305, 14, 34, 19, 'p', 'Neh 8:9'),
 (21306, 14, 34, 19, 'p', 'Gen 37:34'),
 (21307, 14, 34, 19, 'q', 'Gal 3:10-13');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (21308, 14, 34, 19, 'q', 'Rom 7:7-14'),
 (21309, 14, 34, 21, 'r', '2 Kin 17:6'),
 (21310, 14, 34, 22, 's', '2 Kin 22:14'),
@@ -22764,7 +22764,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (22706, 17, 9, 16, 'o', '1 The 5:22'),
 (22707, 17, 9, 16, 'p', 'Est 8:11'),
 (22708, 17, 9, 16, 'p', 'Lev 26:7-8');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (22709, 17, 9, 19, 'q', 'Rev 11:10'),
 (22710, 17, 9, 19, 'q', 'Neh 8:10-12'),
 (22711, 17, 9, 19, 'r', 'Est 8:17'),
@@ -24151,7 +24151,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (24092, 19, 41, 1, 'a', 'Pro 14:21'),
 (24093, 19, 41, 1, 'a', 'Mar 10:21'),
 (24094, 19, 41, 4, 'b', 'Psa 6:2');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (24095, 19, 41, 6, 'c', 'Psa 12:2'),
 (24096, 19, 41, 9, 'd', 'Oba 1:7'),
 (24097, 19, 41, 9, 'd', 'Joh 13:18'),
@@ -25524,7 +25524,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (25464, 19, 118, 12, 'h', 'Deu 1:44'),
 (25465, 19, 118, 12, 'i', 'Ecc 7:6'),
 (25466, 19, 118, 14, 'j', 'Exo 15:2');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (25467, 19, 118, 16, 'k', 'Exo 15:6'),
 (25468, 19, 118, 17, 'l', 'Psa 6:5'),
 (25469, 19, 118, 17, 'm', 'Psa 73:28'),
@@ -26896,7 +26896,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (26835, 21, 2, 19, 'm', '1 Tim 6:10'),
 (26836, 21, 2, 22, 'n', 'Ecc 1:3'),
 (26837, 21, 2, 23, 'o', 'Job 5:7');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (26838, 21, 3, 1, 'a', 'Ecc 8:6'),
 (26839, 21, 3, 2, 'b', '2 Cor 6:9'),
 (26840, 21, 3, 2, 'c', 'Heb 9:27'),
@@ -28294,7 +28294,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (28232, 23, 44, 22, 'q', 'Isa 53:11-12'),
 (28233, 23, 44, 22, 'q', 'Isa 43:25'),
 (28234, 23, 44, 22, 'q', 'Isa 1:18');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (28235, 23, 44, 23, 'r', 'Rev 18:20'),
 (28236, 23, 44, 23, 'r', 'Isa 42:10'),
 (28237, 23, 44, 23, 'r', 'Psa 69:34'),
@@ -29689,7 +29689,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (29626, 24, 17, 13, 'n', 'Dan 12:2'),
 (29627, 24, 17, 13, 'n', 'Eze 36:32'),
 (29628, 24, 17, 13, 'n', 'Eze 16:63');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (29629, 24, 17, 13, 'n', 'Jer 2:26'),
 (29630, 24, 17, 13, 'n', 'Isa 66:5'),
 (29631, 24, 17, 13, 'n', 'Isa 65:13'),
@@ -31060,7 +31060,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (30996, 24, 46, 11, 'k', 'Isa 47:1'),
 (30997, 24, 46, 13, 'l', 'Eze 29'),
 (30998, 24, 46, 13, 'l', 'Jer 43:10');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (30999, 24, 46, 13, 'l', 'Isa 19:1'),
 (31000, 24, 46, 16, 'm', 'Lev 26:37'),
 (31001, 24, 46, 18, 'n', 'Isa 48:2'),
@@ -32449,7 +32449,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (32384, 26, 20, 19, 's', 'Deu 11'),
 (32385, 26, 20, 19, 's', 'Deu 10'),
 (32386, 26, 20, 19, 's', 'Deu 8');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (32387, 26, 20, 19, 's', 'Deu 7'),
 (32388, 26, 20, 19, 's', 'Deu 6'),
 (32389, 26, 20, 19, 's', 'Deu 5:32-33'),
@@ -33821,7 +33821,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (33755, 27, 1, 17, 'k', 'Ecc 2:26'),
 (33756, 27, 1, 17, 'k', 'Pro 2:6'),
 (33757, 27, 1, 17, 'k', 'Psa 119:98-100');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (33758, 27, 1, 17, 'k', '1 Kin 3:12'),
 (33759, 27, 1, 21, 'l', 'Psa 112:8'),
 (33760, 27, 1, 21, 'l', 'Dan 6:28'),
@@ -35230,7 +35230,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (35163, 31, 20, 12, 'j', 'Pro 24:17'),
 (35164, 31, 20, 15, 'k', 'Joe 3:7-8'),
 (35165, 31, 20, 15, 'k', 'Eze 35:15');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (35166, 31, 20, 15, 'k', 'Psa 137:8'),
 (35167, 31, 20, 15, 'k', 'Jdg 1:7'),
 (35168, 31, 20, 19, 'l', 'Zep 2:7'),
@@ -36647,7 +36647,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (36579, 33, 7, 14, 'g', 'Deu 33:28'),
 (36580, 33, 7, 16, 'h', 'Isa 26:11'),
 (36581, 33, 7, 18, 'i', 'Isa 57:16');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (36582, 33, 7, 18, 'i', 'Psa 103:9'),
 (36583, 33, 7, 18, 'j', 'Exo 34:6-7'),
 (36584, 33, 7, 18, 'k', 'Psa 89:6,8'),
@@ -38063,7 +38063,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (37994, 40, 12, 31, 'y', 'Act 7:51'),
 (37995, 40, 12, 31, 'z', '1 Joh 5:16'),
 (37996, 40, 12, 31, 'z', 'Heb 10:26');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (37997, 40, 12, 31, 'z', 'Luk 12:10'),
 (37998, 40, 12, 31, 'z', 'Mar 3:28'),
 (37999, 40, 12, 32, 'a', '1 Tim 1:13'),
@@ -39431,7 +39431,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (39361, 40, 27, 31, 't', 'Mat 20:19'),
 (39362, 40, 27, 31, 't', 'Isa 53:7'),
 (39363, 40, 27, 32, 'u', 'Mar 15:21');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (39364, 40, 27, 32, 'v', 'Heb 13:12'),
 (39365, 40, 27, 32, 'v', 'Act 7:58'),
 (39366, 40, 27, 32, 'v', '1 Kin 21:13'),
@@ -40820,7 +40820,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (40749, 41, 15, 34, 'x', 'Heb 5:7'),
 (40750, 41, 15, 34, 'x', 'Psa 22:1'),
 (40751, 41, 15, 36, 'y', 'Mat 27:48');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (40752, 41, 15, 36, 'y', 'Joh 19:29'),
 (40753, 41, 15, 36, 'z', 'Psa 69:21'),
 (40754, 41, 15, 37, 'a', 'Joh 19:30'),
@@ -42210,7 +42210,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (42138, 42, 17, 12, 'k', 'Num 5:2'),
 (42139, 42, 17, 14, 'l', 'Mat 8:4'),
 (42140, 42, 17, 14, 'l', 'Lev 13:2');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (42141, 42, 17, 15, 'm', 'Psa 103:1'),
 (42142, 42, 17, 16, 'n', '2 Kin 17:24'),
 (42143, 42, 17, 16, 'n', 'Joh 4:9'),
@@ -43604,7 +43604,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (43531, 43, 9, 39, 't', 'Luk 2:34'),
 (43532, 43, 9, 39, 't', 'Act 28:26-27'),
 (43533, 43, 9, 39, 't', '2 Cor 2:16');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (43534, 43, 9, 40, 'u', 'Rom 2:19'),
 (43535, 43, 9, 41, 'v', 'Joh 15:22'),
 (43536, 43, 10, 1, 'a', 'Isa 56:10'),
@@ -44993,7 +44993,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (44919, 44, 10, 2, 'a', 'Act 8:2'),
 (44920, 44, 10, 3, 'b', 'Heb 1:14'),
 (44921, 44, 10, 3, 'b', 'Act 11:13');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (44922, 44, 10, 3, 'b', 'Act 5:19'),
 (44923, 44, 10, 3, 'b', 'Psa 34:7'),
 (44924, 44, 10, 3, 'c', 'Act 11:13'),
@@ -46367,7 +46367,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (46292, 45, 2, 16, 'o', 'Rev 20:12'),
 (46293, 45, 2, 17, 'p', 'Rom 9:6'),
 (46294, 45, 2, 17, 'q', 'Mic 3:11');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (46295, 45, 2, 17, 'r', 'Joh 8:41'),
 (46296, 45, 2, 18, 's', 'Deu 4:8'),
 (46297, 45, 2, 20, 't', '2 Tim 3:5'),
@@ -47766,7 +47766,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (47690, 47, 4, 6, 'g', 'Eph 5:8'),
 (47691, 47, 4, 6, 'g', 'Isa 2:5'),
 (47692, 47, 4, 6, 'g', 'Psa 27:1');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (47693, 47, 4, 6, 'h', '2 Pet 1:19'),
 (47694, 47, 4, 6, 'i', 'Gen 1:3'),
 (47695, 47, 4, 7, 'j', 'Eph 1:19-20'),
@@ -49183,7 +49183,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (49106, 55, 3, 5, 'c', 'Isa 29:13'),
 (49107, 55, 3, 5, 'c', 'Eze 33:30-32'),
 (49108, 55, 3, 6, 'd', 'Mat 23:14');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (49109, 55, 3, 7, 'e', '1 Tim 2:4'),
 (49110, 55, 3, 8, 'f', 'Exo 7:11'),
 (49111, 55, 3, 9, 'g', 'Exo 8:18'),
@@ -50595,7 +50595,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (50517, 57, 0, 23, 's', 'Mat 12:7'),
 (50518, 57, 0, 23, 's', 'Mat 9:13'),
 (50519, 57, 0, 23, 's', 'Mic 6:8');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (50520, 57, 0, 23, 's', 'Hos 6:6'),
 (50521, 57, 0, 23, 's', '1 Sam 15:22'),
 (50522, 57, 0, 23, 't', 'Luk 11:42'),
@@ -52006,7 +52006,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (51927, 60, 5, 13, 'l', 'Gen 10:10'),
 (51928, 60, 5, 13, 'l', 'Rev 17:5'),
 (51929, 60, 5, 13, 'l', 'Rev 17:18');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (51930, 60, 5, 13, 'm', 'Rev 17:18'),
 (51931, 61, 1, 1, 'a', 'Act 11:17'),
 (51932, 61, 1, 1, 'a', 'Eph 4:5'),
@@ -53454,7 +53454,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (53374, 6, 1, 2, 'c', '2 Cor 3:2'),
 (53375, 6, 1, 4, 'd', '2 The 3:9'),
 (53376, 6, 1, 5, 'e', 'Mat 8:14');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (53377, 6, 1, 5, 'f', 'Gal 1:19'),
 (53378, 6, 1, 5, 'f', 'Luk 6:15'),
 (53379, 6, 1, 5, 'f', 'Mar 6:3'),
@@ -54873,7 +54873,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (54792, 65, 0, 40, 'r', 'Joh 13:16'),
 (54793, 65, 0, 40, 'r', 'Joh 15:20'),
 (54794, 65, 0, 41, 's', 'Mat 7:3');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (54795, 65, 0, 42, 't', 'Pro 18:17'),
 (54796, 65, 0, 43, 'u', 'Psa 92:12-14'),
 (54797, 65, 0, 43, 'u', 'Isa 5:4'),
@@ -56289,7 +56289,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (56207, 65, 0, 14, 'p', 'Psa 110:1'),
 (56208, 65, 0, 14, 'p', 'Psa 2:6'),
 (56209, 65, 0, 18, 'q', 'Isa 60:12');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (56210, 65, 0, 21, 'r', 'Rev 11:7'),
 (56211, 65, 0, 22, 's', 'Rev 20:4'),
 (56212, 65, 0, 22, 's', 'Rev 1:6'),
@@ -57705,7 +57705,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (57622, 66, 18, 23, 'w', 'Jer 33:11'),
 (57623, 66, 18, 23, 'x', 'Isa 23:8'),
 (57624, 66, 18, 23, 'y', '2 Kin 9:22');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (57625, 66, 18, 23, 'y', 'Nah 3:4'),
 (57626, 66, 18, 23, 'y', 'Rev 17:2'),
 (57627, 66, 18, 24, 'z', 'Jer 51:49'),
@@ -59116,7 +59116,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (59032, 19, 0, 22, 'h', 'Psa 37:24'),
 (59033, 19, 0, 1, 'a', '1 Sam 4:4'),
 (59034, 19, 0, 1, 'a', 'Psa 99:1');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (59035, 19, 0, 1, 'b', 'Deu 33:2'),
 (59036, 19, 0, 3, 'c', '1 Kin 18:37'),
 (59037, 19, 0, 7, 'd', '1 Kin 18:37'),
@@ -60532,7 +60532,7 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 (60447, 12, 16, 20, 'r', '2 Chr 28:27'),
 (60448, 26, 23, 48, 'i', '2 Pet 2:6'),
 (60449, 46, 3, 23, 's', 'Heb 1:3');
-INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
+INSERT INTO `xref` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALUES
 (60450, 11, 3, 28, 'a', 'Col 2:2-3'),
 (60451, 19, 0, 1, 'a', 'Deu 32:4'),
 (60452, 19, 0, 1, 'a', '1 Sam 2:2'),
@@ -61397,9 +61397,9 @@ INSERT INTO `xref_holman` (`id`, `book`, `chapter`, `verse`, `word`, `ref`) VALU
 --
 
 --
--- Indexes for table `xref_holman`
+-- Indexes for table `xref`
 --
-ALTER TABLE `xref_holman`
+ALTER TABLE `xref`
   ADD PRIMARY KEY (`id`),
   ADD KEY `book` (`book`,`chapter`,`verse`);
 
@@ -61408,9 +61408,9 @@ ALTER TABLE `xref_holman`
 --
 
 --
--- AUTO_INCREMENT for table `xref_holman`
+-- AUTO_INCREMENT for table `xref`
 --
-ALTER TABLE `xref_holman`
+ALTER TABLE `xref`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61308;
 COMMIT;
 
