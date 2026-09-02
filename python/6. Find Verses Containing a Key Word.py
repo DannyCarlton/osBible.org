@@ -11,6 +11,20 @@ print("Content-Type: text/html\n")
 
 print("<h1>Find verses containing a key word.</h1>")
 
+# ------------------------------------------------------------------------------
+# Word boundary syntax for REGEXP.
+#
+# MariaDB and MySQL 5.7 and earlier use POSIX boundaries: [[:<:]]word[[:>:]]
+# MySQL 8.0.4 replaced the regex engine with ICU, which uses \b instead and
+# rejects the POSIX form outright with "repetition-operator operand invalid".
+#
+# The PHP original was written against MariaDB 10.4. This defaults to the
+# MySQL 8 form. If you get a regex error, these are the two lines to change.
+# ------------------------------------------------------------------------------
+
+WB_START = '\\b'                    # MariaDB / MySQL 5.7:  '[[:<:]]'
+WB_END = '\\b'                      # MariaDB / MySQL 5.7:  '[[:>:]]'
+
 # Connect to the database
 try:
     conn = pymysql.connect(
@@ -44,14 +58,14 @@ keyword = 'love'
 book_name = get_books(cursor)
 
 try:
-    # Use REGEXP with word boundaries to match whole words only
-    # MySQL's [[:<:]] and [[:>:]] are word boundary markers
+    # Use REGEXP with word boundaries to match whole words only.
+    # The pattern goes in as a parameter, so pymysql handles the escaping.
     query_text = """
         SELECT * FROM `kjvs`
         WHERE `text` REGEXP %s
         LIMIT 10
     """
-    regexp_pattern = f'[[:<:]]{keyword}[[:>:]]'
+    regexp_pattern = f'{WB_START}{keyword}{WB_END}'
     cursor.execute(query_text, (regexp_pattern,))
     results = cursor.fetchall()
 

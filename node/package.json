@@ -1,12 +1,21 @@
 {
-  "name": "node",
+  "name": "osbible-node",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "Node.js examples for osBible.org — progressively more complex Bible database queries",
+  "main": "server.js",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DannyCarlton/osBible.org.git",
+    "directory": "node"
   },
-  "keywords": [],
+  "homepage": "https://osbible.org",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
   "type": "commonjs",
   "dependencies": {
     "mysql2": "^3.23.3"

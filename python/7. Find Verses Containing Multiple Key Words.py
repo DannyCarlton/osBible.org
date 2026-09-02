@@ -12,6 +12,20 @@ print("Content-Type: text/html\n")
 
 print("<h1>Find verses containing multiple key words.</h1>")
 
+# ------------------------------------------------------------------------------
+# Word boundary syntax for REGEXP.
+#
+# MariaDB and MySQL 5.7 and earlier use POSIX boundaries: [[:<:]]word[[:>:]]
+# MySQL 8.0.4 replaced the regex engine with ICU, which uses \b instead and
+# rejects the POSIX form outright with "repetition-operator operand invalid".
+#
+# The PHP original was written against MariaDB 10.4. This defaults to the
+# MySQL 8 form. If you get a regex error, these are the two lines to change.
+# ------------------------------------------------------------------------------
+
+WB_START = '\\b'                    # MariaDB / MySQL 5.7:  '[[:<:]]'
+WB_END = '\\b'                      # MariaDB / MySQL 5.7:  '[[:>:]]'
+
 # Connect to the database
 try:
     conn = pymysql.connect(
@@ -25,6 +39,24 @@ try:
 except Exception as e:
     print(f"<p>Connection error: {e}</p>")
     exit()
+
+
+def sql_quote(value):
+    """Quote a string for inclusion in SQL.
+
+    Normally %s placeholders handle this. But the WHERE clause below is of
+    unknown shape -- one REGEXP condition per search term -- and a placeholder
+    can stand in for a value, not for a fragment of SQL. So the fragment has to
+    be built as text, and the escaping is ours to get right.
+
+    The PHP original does not escape here at all. A keyword containing a quote
+    breaks the query, and a carefully chosen one could do worse. Escaping also
+    matters for the word boundary marker: a lone backslash in a MySQL string
+    literal is an escape character, so \\b has to reach the server doubled or it
+    is read as a backspace.
+    """
+    return "'" + conn.escape_string(str(value)) + "'"
+
 
 # Test keywords with notes
 Keywords = []
@@ -59,12 +91,12 @@ for k, keyword in enumerate(Keywords):
         for kw in words:
             kw = kw.replace('_', ' ')                        # Return any underscores to spaces
             kw = kw.replace('*', '[a-zA-Z]*')                # Change asterisks to usable regular expression
-            search_key_parts.append(f"`text` REGEXP '[[:<:]]{kw}[[:>:]]'")
+            search_key_parts.append("`text` REGEXP " + sql_quote(WB_START + kw + WB_END))
         search_key = ' AND '.join(search_key_parts)          # Link them with AND operators
     else:
         keyword = keyword.replace('_', ' ')                  # Phrases turned back into correct form
         keyword = keyword.replace('*', '[a-zA-Z]*')          # Turn asterisk into regular expression
-        search_key = f"`text` REGEXP '[[:<:]]{keyword}[[:>:]]'"
+        search_key = "`text` REGEXP " + sql_quote(WB_START + keyword + WB_END)
 
     # Because of the Strong's coding in 'kvvs' it's not usable for a complicated search
     query_text = f"""SELECT * FROM `kjv`

@@ -3,7 +3,11 @@ error_reporting(E_ALL);
 echo "<h1>Pagination.</h1>\n";
 /*************************************************************************************
  * 
- * 	This script is to demonstrate basic pagination to allow the site visitor to navigate through a lengthy result.
+ * 	This script is to demonstrate basic pagination to allow the site visitor to navigate 
+ * 		through a lengthy result.
+ * 
+ * 	The search itself is the same one script 7 does. What is new here is counting the whole
+ * 		result, asking for only one page of it, and building the page links.
  * 
  ***************************************************************************************/
 
@@ -18,82 +22,136 @@ $_mysql = mysqli_connect('localhost','db_user','db_password','osbible');
 
 /*******************************
  * 
- * Get a selection of verses based on a simple keyword.
+ * Word boundary syntax for REGEXP. READ THIS IF THE SEARCH THROWS AN ERROR.
+ * 
+ * MariaDB and MySQL 5.7 and earlier use the POSIX markers [[:<:]] and [[:>:]].
+ * MySQL 8.0.4 replaced the regex engine with ICU, which uses \b instead and rejects
+ * 	the POSIX form outright with "repetition-operator operand invalid".
+ * These two variables are the switch. See script 6 for the longer explanation.
+ * 
+ *****************************/
+
+$WB_START='\b';			# MariaDB / MySQL 5.7:  '[[:<:]]'
+$WB_END='\b';			# MariaDB / MySQL 5.7:  '[[:>:]]'
+
+$per_page=10;			# how many results on a page. Change it here, or let the visitor choose.
+$window=9;				# how many numbered links to show at once.
+						# 	An odd number keeps the current page centered. An even one
+						# 	leaves the row lopsided, with more pages on one side than the other.
+
+
+/*******************************
+ * 
+ * Which page did the visitor ask for?
+ * 
+ * The original wrote $currentpage=$_GET['page']-1 and cast to int afterwards. Subtracting
+ * 	from a string that is not a number is a TypeError in PHP 8, so the cast has to come
+ * 	first. That cast is the entire defense on this value before it reaches the LIMIT clause.
+ * 
+ * Page numbers here are one-based from top to bottom. The original mixed the two -- it
+ * 	stored a zero-based page and then compared it against the one-based numbers in the
+ * 	link loop, so no link ever received the "active" class and the current page was never
+ * 	marked. That is the bug this rewrite is mostly about.
+ * 
+ *****************************/
+
+if(isset($_GET['page']))
+	{
+	$currentpage=(int)$_GET['page'];
+	}
+else
+	{
+	$currentpage=1;
+	}
+if($currentpage<1){$currentpage=1;}
+
+
+/*******************************
+ * 
+ * Build the search. This is script 7's code, with the same two corrections:
+ * 	one branch instead of two, and each term escaped as it goes into its own condition.
+ * 	The original ran the query through sprintf() with mysqli_real_escape_string() as the
+ * 	argument, but the format string had no %s in it -- so the escaped value went nowhere
+ * 	and the terms reached the query unescaped. It happens twice in this script.
  * 
  *****************************/
 
 $keyword='love';
-if(isset($_GET['page']))
-	{
-	$currentpage=$_GET['page']-1;			# Since we'll use this variable in our mysql query, 
-	$currentpage=(int)$currentpage;				#   we want to make sure it's an integer to prevent any mysql injection hack.						
-	}
-else
-	{
-	$currentpage=0;
-	}
-$start=$currentpage*10;
-$end=$start+10;						# for now we are use ten results per page. 
-									# 	This can be changed in the programming, or even by the visitor if you allow it.
-$begin=$start+1;					# while we use a zero for our query, for humans it's a one
-
-
-$_keyword=$keyword;$SearchKey=[];
-echo "<div style=\"float:left;width:450px;margin-left:30px;padding:0 15px;margin-bottom:10px;border:1px solid #000\">\n";
+$_keyword=$keyword;
+$SearchKey=[];							// the SQL conditions
+$Terms=[];								// the plain terms, for the highlighter
 $Verses=[];
-	
+
 if(strstr($keyword,'"'))							// Catch quotes that will designate a phrase
 	{
-	preg_match_all('/"(.*?)"/',$keyword,$Matches); 	// This expression pulls any words within quote into the array Matches
-	$newKeywords=$Matches[1];						// Now we have an array with the phrases.
-		
-	foreach($newKeywords as $kw)
+	preg_match_all('/"(.*?)"/',$keyword,$Matches);	// This expression pulls any words within quotes into the array Matches
+	foreach($Matches[1] as $kw)
 		{
 		$_kw=str_replace(' ','_',trim($kw));		//  We'll replace the space with an underline so we can avoid it later
-		$keyword=str_replace($kw,$_kw,$keyword);	//		for examples 'David "loved her"' is now 'David "loved_her"' 
+		$keyword=str_replace($kw,$_kw,$keyword);	//		for example 'David "loved her"' is now 'David "loved_her"'
 		}
 	$keyword=str_replace('"','',$keyword);			// remove the quotes
 	}
 
-if(strstr($keyword,' '))							// if we have multiple words...
+$Words=explode(' ',$keyword);
+foreach($Words as $kw)
 	{
-	$Keywords=explode(' ',$keyword);
-	foreach($Keywords as $kw)
-		{
-		$kw=str_replace('_',' ',$kw);				//  return any underscores to spaces.
-		$kw=str_replace('*','[a-zA-Z]*',$kw);		//  change any asterisks to a usable regular expression
-		$SearchKey[]="`text` REGEXP '[[:<:]]".$kw."[[:>:]]'";		// We are creating an arrray of regular expressions
-		}
-	$search_key=implode(' AND ',$SearchKey);		// ...and linking them with 'AND' operators.
+	if($kw==''){continue;}
+	$kw=str_replace('_',' ',$kw);					//  return any underscores to spaces.
+	$Terms[]=$kw;									//  the term as it was typed, for the highlighter
+	$pattern=str_replace('*','[a-zA-Z]*',$kw);		//  change any asterisks to a usable regular expression
+	$SearchKey[]="`text` REGEXP '".mysqli_real_escape_string($_mysql, $WB_START.$pattern.$WB_END)."'";
 	}
-else
-	{
-	$keyword=str_replace('_',' ',$keyword);			// phrases are now turned back into the correct form
-	$keyword=str_replace('*','[a-zA-Z]*',$keyword);	// again, turn the asterisk into the regular expression
-	$search_key="`text` REGEXP '[[:<:]]".$keyword."[[:>:]]'";	//	Since there were no spaces, we only have one keyword (or phrase)
-	}
-													//	Because of the strong's coding in 'kjvs' it's not usable for a complicated search.
-													//  	so we use `kjv` which has the plain text. 
-													//		Also, this time, we just want the total count
-$querytext=sprintf("SELECT	count(`id`) 		FROM	`kjv`
-					WHERE	$search_key",
-			mysqli_real_escape_string($_mysql, $keyword));
+$search_key=implode(' AND ',$SearchKey);			// ...and linking them with 'AND' operators.
+
+
+/*******************************
+ * 
+ * The count.
+ * 
+ * Because of the strong's coding in `kjvs` it's not usable for a complicated search,
+ * 	so we use `kjv`, which holds the plain text.
+ * This time we just want the total, so we know how many pages there are. Two queries
+ * 	per page is the cost of pagination -- an unpaginated page needs only one.
+ * 
+ *****************************/
+
+$count=0;
+$querytext="SELECT count(`id`) AS `total` FROM `kjv` WHERE $search_key";
 $query = mysqli_query($_mysql, $querytext);
 if(mysqli_errno($_mysql))
 	{
 	echo ": " . mysqli_error($_mysql) . "\n<hr>$querytext";
 	}
-if ($query !== false) 
+if($query !== false) 
 	{
 	$Value = mysqli_fetch_assoc($query);
-	$count=$Value['count(`id`)'];
+	$count=(int)$Value['total'];
 	}
 
-													// Now, we want just the few specified by the start and the length
-$querytext=sprintf("SELECT	* 		FROM	`kjv`
-					WHERE	$search_key
-					LIMIT	$start,10;",
-			mysqli_real_escape_string($_mysql, $keyword));
+# Since we are showing ten per page, we need to know how many pages we need.
+# 	ceil() covers the leftovers: 305 results over 10 per page is 31 pages, not 30.
+$pages=($count>0)?(int)ceil($count/$per_page):1;
+
+# Now that the total is known, a page number past the end can be pulled back.
+if($currentpage>$pages){$currentpage=$pages;}
+
+$start=($currentpage-1)*$per_page;		# where the LIMIT begins -- zero-based, as MySQL wants it
+$begin=$start+1;						# while we use a zero for our query, for humans it's a one
+$end=min($start+$per_page,$count);		# the last page is usually short, so don't promise ten
+
+
+/*******************************
+ * 
+ * The page itself.
+ * 
+ * $start is an integer by construction above, so it is safe in the LIMIT clause.
+ * 
+ *****************************/
+
+$querytext="SELECT * FROM `kjv`
+			WHERE	$search_key
+			LIMIT	$start,$per_page;";
 
 	# Submit the query
 $query = mysqli_query($_mysql, $querytext);
@@ -104,162 +162,132 @@ if(mysqli_errno($_mysql))
 	echo ": " . mysqli_error($_mysql) . "\n<hr>$querytext";
 	}
 # If there's a result...
-if(mysqli_num_rows($query))
+if($query and mysqli_num_rows($query))
 	{
 	# 	Begin processing the results
 	while ($dbRow = mysqli_fetch_assoc($query))
 		{
 	# 	Get the id of this row
 		$id=$dbRow['id'];
-	#	get the book name
-		$book=$dbRow['book'];
-	#	get the chapter
-		$chapter=$dbRow['chapter'];
-	#	get the verse
-		$verse=$dbRow['verse'];
 	#	create the reference
-		$ref="$book $chapter:$verse";
+		$ref=$dbRow['book']." ".$dbRow['chapter'].":".$dbRow['verse'];
 	#	get the text of the verse
 		$text=$dbRow['text'];	
 	#	Filter out the Strong's numbers (we don't need them now)
 		$text=preg_replace('/\{(.*?)\}/', '', $text);
 	#	put the text and the reference into an array.
-	#	Yes, we could output it here, but more often than not there will be other things we need to do, 
-	#		or put this code in a function that will only return this array
 		$Verses[$id]['ref']=$ref;	
 		$Verses[$id]['text']=$text;
 		}
 	}
 
-#	Now we'll out put the results. First a reminder of the keyword...
-echo "  <div style=\"width:450px;margin-bottom:20px;\">
-    <h3>$begin - $end of $count verses containing the word &ldquo;$_keyword&rdquo;</h3>
-  </div>\n";
-#	Now the list (first 10) of the verse we found.
+
+/*******************************
+ * 
+ * The results.
+ * 
+ * preg_quote() keeps a term from being read as a pattern, then the asterisk is put back
+ * 	deliberately so a wildcard search highlights the whole word it matched.
+ * 
+ *****************************/
+
 $result_text="\n";
 foreach($Verses as $Verse)
 	{
 	$ref=$Verse['ref'];
 	$text=$Verse['text'];
-	# here's we'll use preg_replace to find the keyword, make it bold and dark red.
-	if(strstr($_keyword,'"') or strstr($_keyword,'*'))
+	foreach($Terms as $term)
 		{
-		foreach($newKeywords as $kw)
-			{
-			$_kw=str_replace(' ','_',trim($kw));		//  We'll replace the space with an underline so we can avoid it later
-			$keyword=str_replace($kw,$_kw,$keyword);
-			}
-		$Words=explode(' ',$keyword);
-		foreach($Words as $word)
-			{
-			$word=str_replace('_',' ',$word);
-			$text=preg_replace("/\b$word\b/i", '<b style="color:#990000">$0</b>', $text);
-			}
-		$text=preg_replace("/\b$keyword\b/i", '<b style="color:#990000">$0</b>', $text);
+		$pattern=str_replace('\*','[a-zA-Z]*',preg_quote($term,'/'));
+		$text=preg_replace("/\b$pattern\b/i", '<b style="color:#990000">$0</b>', $text);
 		}
-	else
-		{
-		if(strstr($keyword,' '))
-			{
-			list($first,$second)=explode(' ',$keyword);
-			$text=preg_replace("/\b$first\b/i", '<b style="color:#990000">$0</b>', $text);
-			$text=preg_replace("/\b$second\b/i", '<b style="color:#990000">$0</b>', $text);
-			}
-		else
-			{
-			$text=preg_replace("/\b$keyword\b/i", '<b style="color:#990000">$0</b>', $text);				
-			}
-		}
-	# Now we'll echo the verse with the reference.
 	$result_text .=  "  <div style=\"width:450px;margin-bottom:20px;margin-top:20px\">
     &ldquo;$text&rdquo;&mdash;$ref
   </div>\n";	
 	}
-$pages=floor($count/10);			# Since we are showing ten per page, we need to know how many pages we need.
-if($pages*10!=$count)				# While a multiple of ten would work, if there are more...
-	{
-	$pages++;						#	...then we'll need another page.
-	$lastpage=$count-($pages*10);	#	...and we'll need to note how many items will be on the last page;
-	}
-else
-	{
-	$lastpage=10;					# If the count IS a multiple of then, obviously, our last page count will be ten.
-	}
-$currentpage=$start/10;				# We are using the item count as the $start variable. We could just as easily use the page.
-									# 	I tend to favor the item # because it allow the visitor to manually change the start item,
-									#	rather than being stuck to a page.
 
-									# THE PAGINATION...
-									# In this case (using the keyword "love") there will be 30 pages which would be too many to show the links, 
-									# 	so we'll truncate them. 
-									# If we want to show 10 links (this number can be whatever fits the pagination area)
-									#	then we need to display them with some sort of symbols to show that it's a partial list.
-									# Typically if we're on the first page we show that, seven more, then a next arrow and a last arrow
-									# 	That gives us ten spaces.i.e.[-1-][2][3][4][5][6][7][8][>][>>]
-									# However, if we've moved on into the list, then we'll want to show a start arrow, and previous arrow
-									# 	the three pages before our current page, the current page, the next three, a next arrow and an end arrow. 
-									#  	i.e. [<<][<][3][4][5][-6-][7][8][9][>][>>]
-									# This means that you need at least 5 spaces minimum to show the pagination (start,previous, current, next, last)
-									#	i.e. [<<][<][-6-][>][>>] (assuming we're on page 6). Obviously, you would really want more than 5 spaces.
-									# So we need to create the logic to lay out our pagination.
 
-									# Since we can show 3 previous pages, we won't need the start and previous arrows until on page 6 or higher.
-									#  i.e. [1][2][3][4][-5-][6][7][8][>][>>] vs. [<<][<][3][4][5][-6-][7][8][>][>>]
-									# You'll notice than by using an even numebr of pages, we are left with a lopsides pagination.
-									#	That's because the current page plus the pages on either side will need to be an odd number.
-									#	If avoiding the lopsidesness is a priority to you, then use an odd number of pages.
-$_pages=$pages+1;$_end=true;$end='';
-$note='';
-$pagination = " 
-  <div class=\"pagination row\">";
-$b=$currentpage-4;
-$note.=__LINE__." \$b=$b, \$lastpage=$lastpage, \$count=$count, \$pages=$pages<br>\n";
-if($b<1){$b=1;}
-$note.=__LINE__." \$b=$b<br>\n";
-if($b>1){$prev=$b-1;$begin=" <a href=\"8.%20Pagination.php?page=$prev\" class=\"pagination page\">&laquo;</a>\n";}
-else{$begin='';}
-$note.=__LINE__." \$b=$b<br>\n";
-$e=$b+8;
-$note.=__LINE__." \$b=$b, \$e=$e<br>\n";
-if($e>$pages){$e=$pages;$b=$pages-8;}
-$note.=__LINE__." \$b=$b, \$e=$e<br>\n";
-if($e<$pages)
-	{
-	$next=$e+1;
-	$end="    <a href=\"8.%20Pagination.php?page=$next\" class=\"pagination page\">&raquo;</a>\n";
-	}
-
-$nums='';$next=0;
-$c=0;								# our page counter
-$_c=$b;
-$note.="Current page is $currentpage<br>
-Total pages: $pages<br>\n
-start at $b<br>
-end at $e";
-for($p=$b;$p<=$e;$p++)
-	{
-	$_p=$p;						# This is the display number
-/************
- * if $p <$b ignore
- * if $p >=$b but less than $b+8 output
- * if $b
+/*******************************
  * 
- */
-	if($p==$currentpage)
+ * THE PAGINATION.
+ * 
+ * Searching for "love" gives around 31 pages, which is far too many links to lay out in
+ * 	a 450px column, so the list is truncated to a window around the current page with an
+ * 	arrow at each end.
+ * 
+ * 	On page 1:   [-1-][2][3][4][5][6][7][8][9][>]
+ * 	On page 6:   [<][2][3][4][5][-6-][7][8][9][>]
+ * 	On page 31:  [<][23][24][25][26][27][28][29][30][-31-]
+ * 
+ * With a nine-wide window there is room for four pages either side of the current one.
+ * 	The minimum that makes sense is three (previous, current, next); anything less and the
+ * 	arrows are doing all the work.
+ * 
+ * The links are relative -- "?page=2" rather than "8.%20Pagination.php?page=2" -- so the
+ * 	script still works if it is reached through a rewrite rule or renamed.
+ * 
+ *****************************/
+
+function pagination($currentpage,$pages,$window)
+	{
+	# One page needs no links at all.
+	if($pages<2){return '';}
+
+	# Try to center the window on the current page...
+	$first=$currentpage-(int)floor($window/2);
+	if($first<1){$first=1;}
+
+	# ...then pull it back if that ran past the end. Clamping $first a second time
+	# 	matters when there are fewer pages than the window is wide.
+	$last=$first+$window-1;
+	if($last>$pages)
 		{
-		$nums.= "    <a href=\"8.%20Pagination.php?page=$_p\" class=\"pagination page num active\"><span>$_p</span></a>\n";
+		$last=$pages;
+		$first=max(1,$last-$window+1);
 		}
-	else
+
+	$links='';
+	# The back arrow only appears once there is something behind the window.
+	if($first>1)
 		{
-		$nums.= "    <a href=\"8.%20Pagination.php?page=$_p\" class=\"pagination page num\"><span>$_p</span></a>\n";
+		$prev=$first-1;
+		$links.="    <a href=\"?page=$prev\" class=\"pagination page\">&laquo;</a>\n";
 		}
+
+	for($p=$first;$p<=$last;$p++)
+		{
+		# Both sides of this comparison are one-based, so the current page is
+		# 	actually marked. In the original they were not.
+		$active=($p==$currentpage)?' active':'';
+		$links.="    <a href=\"?page=$p\" class=\"pagination page num$active\"><span>$p</span></a>\n";
+		}
+
+	# ...and the forward arrow only while there is something ahead of it.
+	if($last<$pages)
+		{
+		$next=$last+1;
+		$links.="    <a href=\"?page=$next\" class=\"pagination page\">&raquo;</a>\n";
+		}
+
+	return "  <div class=\"pagination row\">\n$links  </div>\n";
 	}
-$pagination .= "
-$begin$nums$end  </div>\n";
 
-	echo $pagination.$result_text.$pagination.'</div>'."<br><div style=\"margin-left:550px\">$note</div>";
+$pagination=pagination($currentpage,$pages,$window);
 
 
+/*******************************
+ * 
+ * Output. Links above the results and again below them, so a visitor who has read to the
+ * 	bottom of the page does not have to scroll back up to go on.
+ * 
+ *****************************/
+
+echo "<div style=\"float:left;width:450px;margin-left:30px;padding:0 15px;margin-bottom:10px;border:1px solid #000\">\n";
+echo "  <div style=\"width:450px;margin-bottom:20px;\">
+    <h3>$begin - $end of $count verses containing the word &ldquo;$_keyword&rdquo;</h3>
+  </div>\n";
+echo $pagination.$result_text.$pagination;
+echo "</div>\n";
 
 ?>
 

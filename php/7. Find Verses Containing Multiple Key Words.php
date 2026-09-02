@@ -23,12 +23,27 @@ $_mysql = mysqli_connect('localhost','db_user','db_password','osbible');
 
 /*******************************
  * 
- * Get a selection of verses based on a simple keyword.
+ * Word boundary syntax for REGEXP. READ THIS IF THE SEARCH THROWS AN ERROR.
+ * 
+ * MariaDB and MySQL 5.7 and earlier use the POSIX markers [[:<:]] and [[:>:]].
+ * MySQL 8.0.4 replaced the regex engine with ICU, which uses \b instead and rejects
+ * 	the POSIX form outright with "repetition-operator operand invalid".
+ * These two variables are the switch. See script 6 for the longer explanation.
+ * 
+ *****************************/
+
+$WB_START='\b';			# MariaDB / MySQL 5.7:  '[[:<:]]'
+$WB_END='\b';			# MariaDB / MySQL 5.7:  '[[:>:]]'
+
+
+/*******************************
+ * 
+ * Get a selection of verses based on one or more keywords.
  * 
  *****************************/
 
 $Keywords=[];
-$Notes=[];
+$Note=[];
 $Keywords[0]='with love';
 $Note[0]='Two keywords.';
 $Keywords[1]='"loved her"';
@@ -39,51 +54,71 @@ $Keywords[3]='love*';
 $Note[3]='Keyword with wild card.';
 
 
- foreach($Keywords as $k=>$keyword)
+foreach($Keywords as $k=>$keyword)
 	{
 	$_k=$k+1;
-	$_keyword=$keyword;$SearchKey=[];
+	$_keyword=$keyword;					// keep the original, exactly as it was typed
+	$SearchKey=[];						// the SQL conditions
+	$Terms=[];							// the plain terms, for the highlighter
 	$note=$Note[$k];
-	echo "<div style=\"float:left;width:380px;margin-left:30px;padding:15px;margin-bottom:10px;border:1px solid #000\">";
 	$Verses=[];
-		
+	echo "<div style=\"float:left;width:380px;margin-left:30px;padding:15px;margin-bottom:10px;border:1px solid #000\">";
+
 	if(strstr($keyword,'"'))							// Catch quotes that will designate a phrase
 		{
-		preg_match_all('/"(.*?)"/',$keyword,$Matches); 	// This expression pulls any words within quote into the array Matches
-		$newKeywords=$Matches[1];						// Now we have an array with the phrases.
+		preg_match_all('/"(.*?)"/',$keyword,$Matches); 	// This expression pulls any words within quotes into the array Matches
+		$Phrases=$Matches[1];							// Now we have an array with the phrases.
 			
-		foreach($newKeywords as $kw)
+		foreach($Phrases as $kw)
 			{
 			$_kw=str_replace(' ','_',trim($kw));		//  We'll replace the space with an underline so we can avoid it later
-			$keyword=str_replace($kw,$_kw,$keyword);	//		for examples 'David "loved her"' is now 'David "loved_her"' 
+			$keyword=str_replace($kw,$_kw,$keyword);	//		for example 'David "loved her"' is now 'David "loved_her"' 
 			}
 		$keyword=str_replace('"','',$keyword);			// remove the quotes
 		}
 
-	if(strstr($keyword,' '))							// if we have multiple words...
-		{
-		$Keywords=explode(' ',$keyword);
-		foreach($Keywords as $kw)
-			{
-			$kw=str_replace('_',' ',$kw);				//  return any underscores to spaces.
-			$kw=str_replace('*','[a-zA-Z]*',$kw);		//  change any asterisks to a usable regular expression
-			$SearchKey[]="`text` REGEXP '[[:<:]]".$kw."[[:>:]]'";		// We are creating an arrray of regular expressions
-			}
-		$search_key=implode(' AND ',$SearchKey);		// ...and linking them with 'AND' operators.
-		}
-	else
-		{
-		$keyword=str_replace('_',' ',$keyword);			// phrases are now turned back into teh correct form
-		$keyword=str_replace('*','[a-zA-Z]*',$keyword);	// again, turn the asterisk inot the regular expression
-		$search_key="`text` REGEXP '[[:<:]]".$keyword."[[:>:]]'";	//	Snce there were no spaces, wer only have one keyword (or phrase)
-		}
-	// 												Because of the strong's coding in 'kvvs' it's not usable for a complicated search.
-	$querytext=sprintf("SELECT	* 		FROM	`kjv`
-						WHERE	$search_key
-						LIMIT	8;",
-				mysqli_real_escape_string($_mysql, $keyword));
+	/*******************************
+	 * 
+	 * Build one condition per term.
+	 * 
+	 * The original had two branches here -- one for several words, one for a single
+	 * 	word -- doing the same work twice. explode() on a string with no spaces returns
+	 * 	a one element array, so the single word case is just the loop running once.
+	 * 	One branch instead of two means a fix only has to be made in one place.
+	 * 
+	 * Two other things worth pointing out:
+	 * 
+	 * 1. The original wrote $Keywords=explode(...) INSIDE the foreach that is walking
+	 * 		$Keywords. PHP iterates over a copy, so it happens to work, but overwriting
+	 * 		the array you are looping over is a trap. It is $Words here.
+	 * 
+	 * 2. The original ran the query through sprintf() with mysqli_real_escape_string()
+	 * 		as the argument -- but the format string had no %s in it, so the escaped
+	 * 		value went nowhere and the terms reached the query unescaped. That is a real
+	 * 		injection hole, hidden by code that looks like it is doing the right thing.
+	 * 		Each term is escaped here instead, as it goes into its own condition.
+	 * 
+	 *****************************/
 
-		# Submit the fquery
+	$Words=explode(' ',$keyword);
+	foreach($Words as $kw)
+		{
+		if($kw==''){continue;}
+		$kw=str_replace('_',' ',$kw);					//  return any underscores to spaces.
+		$Terms[]=$kw;									//  the term as it was typed, for the highlighter
+		$pattern=str_replace('*','[a-zA-Z]*',$kw);		//  change any asterisks to a usable regular expression
+														//  We are creating an array of regular expressions...
+		$SearchKey[]="`text` REGEXP '".mysqli_real_escape_string($_mysql, $WB_START.$pattern.$WB_END)."'";
+		}
+	$search_key=implode(' AND ',$SearchKey);			// ...and linking them with 'AND' operators.
+
+	// 												Because of the strong's coding in `kjvs` it's not usable for a complicated search,
+	//													so we use `kjv`, which holds the plain text.
+	$querytext="SELECT	* 		FROM	`kjv`
+				WHERE	$search_key
+				LIMIT	8;";
+
+		# Submit the query
 	$query = mysqli_query($_mysql, $querytext);
 		# Receive the results
 	if(mysqli_errno($_mysql))
@@ -92,7 +127,7 @@ $Note[3]='Keyword with wild card.';
 		echo ": " . mysqli_error($_mysql) . "\n<hr>$querytext";
 		}
 	# If there's a result...
-	if(mysqli_num_rows($query))
+	if($query and mysqli_num_rows($query))
 		{
 		# 	Begin processing the results
 		while ($dbRow = mysqli_fetch_assoc($query))
@@ -119,43 +154,39 @@ $Note[3]='Keyword with wild card.';
 			}
 		}
 
-	#	Now we'll out put the results. Forst a reminder of the keyword...
+	#	Now we'll output the results. First a reminder of the keyword...
 	echo "<div style=\"width:380px;margin-bottom:20px;\"><h3>Example #$_k. $note<small style=\"font-weight:normal\"><br>keyword(s): $_keyword</small></h3></div>";
-	#	Now the list (first 10) of the verse we found.
+
+	/*******************************
+	 * 
+	 * The highlighter.
+	 * 
+	 * The original rebuilt the phrase-to-underscore juggling all over again down here,
+	 * 	then branched three ways on whether the keyword had quotes, an asterisk or a
+	 * 	space -- and the last branch used list($first,$second) on an explode, which
+	 * 	raises a warning the moment there is only one word. We already collected the
+	 * 	terms while building the query, so we can just walk them.
+	 * 
+	 * preg_quote() keeps a term from being read as a pattern. Then the asterisk is put
+	 * 	back deliberately, because a wildcard search should highlight the whole word it
+	 * 	matched, not just the stem.
+	 * 
+	 *****************************/
+
 	foreach($Verses as $Verse)
 		{
 		$ref=$Verse['ref'];
 		$text=$Verse['text'];
-		# here's we'll use preg_replace to find the keyword, make it bold and dark red.
-		if(strstr($_keyword,'"') or strstr($_keyword,'*'))
+		foreach($Terms as $term)
 			{
-			foreach($newKeywords as $kw)
-				{
-				$_kw=str_replace(' ','_',trim($kw));		//  We'll replace the space with an underline so we can avoid it later
-				$keyword=str_replace($kw,$_kw,$keyword);
-				}
-			$Words=explode(' ',$keyword);
-			foreach($Words as $word)
-				{
-				$word=str_replace('_',' ',$word);
-				$text=preg_replace("/\b$word\b/i", '<b style="color:#990000">$0</b>', $text);
-				}
-			$text=preg_replace("/\b$keyword\b/i", '<b style="color:#990000">$0</b>', $text);
-			}
-		else
-			{
-			list($first,$second)=explode(' ',$keyword);
-			$text=preg_replace("/\b$first\b/i", '<b style="color:#990000">$0</b>', $text);
-			$text=preg_replace("/\b$second\b/i", '<b style="color:#990000">$0</b>', $text);
-
+			$pattern=str_replace('\*','[a-zA-Z]*',preg_quote($term,'/'));
+			$text=preg_replace("/\b$pattern\b/i", '<b style="color:#990000">$0</b>', $text);
 			}
 		# Now we'll echo the verse with the reference.
 		echo "<div style=\"width:380px;margin-bottom:20px\">
 				&ldquo;$text&rdquo;&mdash;$ref</div>";	
 		}
-	echo "</div>\n";$newKeyords=[];$kw='';
+	echo "</div>\n";
 	}
-
-
 
 ?>
